@@ -1,39 +1,41 @@
-function SimpleVue(dataObj) {
-  // 1- Initiate dependencies object
-  let deps = {};
+class SimpleVue {
+  constructor(dataObj) {
+    // 1- Initiate dependencies object
+    this.deps = {};
 
-  // 2- Convert data object to reactive properties
-  convertDateToReactiveProperties(dataObj);
+    this.data = dataObj;
 
-  function convertDateToReactiveProperties(data) {
-    for (prop in data) {
+    // 2- Convert data object to reactive properties
+    this.convertDateToReactiveProperties(this.data);
+  }
+
+  convertDateToReactiveProperties(data) {
+    for (let prop in data) {
       if (data.hasOwnProperty(prop)) {
         let val = data[prop];
 
         Object.defineProperty(data, prop, {
-          get() {
-            return val;
-          },
-          set(newVal) {
+          get: () => val,
+          set: newVal => {
             val = newVal;
 
             // 5- In property setter, notify other dependencies that property has changed
-            notifyOtherDeps(prop);
+            this.notifyOtherDeps(prop);
           }
         });
       }
     }
 
     // 3- After converting data object to reactive properties, parse DOM
-    parseDOM(data);
+    this.parseDOM(data);
   }
 
-  function notifyOtherDeps(prop) {
-    if (!deps[prop] || !deps[prop].length) return;
-    deps[prop].map(dep => dep());
+  notifyOtherDeps(prop) {
+    if (!this.deps[prop] || !this.deps[prop].length) return;
+    this.deps[prop].map(dep => dep());
   }
 
-  function parseDOM(reactiveDataObj) {
+  parseDOM(reactiveDataObj) {
     let nodes = document.querySelectorAll('[v-model]');
 
     if (nodes && nodes.length)
@@ -42,22 +44,18 @@ function SimpleVue(dataObj) {
         let dep = () => (node.textContent = reactiveDataObj[propName]);
 
         // 4- Attach dependencies to the reactive property
-        setReactivePropertyDeps(propName, dep);
+        this.setReactivePropertyDeps(propName, dep);
       });
   }
 
-  function setReactivePropertyDeps(propName, dep) {
-    if (!deps[propName]) deps[propName] = [];
+  setReactivePropertyDeps(propName, dep) {
+    if (!this.deps[propName]) this.deps[propName] = [];
 
-    deps[propName].push(dep);
+    this.deps[propName].push(dep);
   }
-
-  return {
-    data: dataObj
-  };
 }
 
-let simpleVue = SimpleVue({
+let simpleVue = new SimpleVue({
   title: 'Hello all'
 });
 
