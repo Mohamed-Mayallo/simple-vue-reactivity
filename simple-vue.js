@@ -17,14 +17,14 @@ function SimpleVue(dataObj) {
           set(newVal) {
             val = newVal;
 
-            // 3- In property setter, notify other dependencies that property has changed
+            // 5- In property setter, notify other dependencies that property has changed
             notifyOtherDeps(prop);
           }
         });
       }
     }
 
-    // 4- After converting data object to reactive properties, parse DOM
+    // 3- After converting data object to reactive properties, parse DOM
     parseDOM(data);
   }
 
@@ -35,10 +35,21 @@ function SimpleVue(dataObj) {
 
   function parseDOM(reactiveDataObj) {
     let nodes = document.querySelectorAll('[v-model]');
+
     if (nodes && nodes.length)
-      nodes.map(node => {
-        node.textContent = node.attributes['v-model'].value;
+      Array.from(nodes).map(node => {
+        let propName = node.attributes['v-model'].value;
+        let dep = () => (node.textContent = reactiveDataObj[propName]);
+
+        // 4- Attach dependencies to the reactive property
+        setReactivePropertyDeps(propName, dep);
       });
+  }
+
+  function setReactivePropertyDeps(propName, dep) {
+    if (!deps[propName]) deps[propName] = [];
+
+    deps[propName].push(dep);
   }
 
   return {
@@ -51,6 +62,5 @@ let simpleVue = SimpleVue({
 });
 
 function updateNode(prop, event) {
-  // console.log(simpleVue.data, prop, simpleVue.data[prop]);
   simpleVue.data[prop] = event.target.value;
 }
