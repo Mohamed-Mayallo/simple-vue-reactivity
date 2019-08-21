@@ -40,7 +40,13 @@ class SimpleVue {
 
     if (nodes && nodes.length)
       Array.from(nodes).map(node => {
+        // Get property name "title"
         let propName = node.attributes['v-model'].value;
+
+        // To set initial value
+        node.textContent = reactiveDataObj[propName];
+
+        // Callback that will be attached to the reactive property
         let dep = () => (node.textContent = reactiveDataObj[propName]);
 
         // 4- Attach dependencies to the reactive property
