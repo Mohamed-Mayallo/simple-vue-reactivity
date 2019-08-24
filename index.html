@@ -8,8 +8,11 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
   </head>
   <body>
-    <h1 v-model="title"></h1>
-    <input type="text" oninput="updateNode('title', event)" />
+    <h1>{{ fName }}</h1>
+    <h1>{{ lName }}</h1>
+    <h1>{{ fullName }}</h1>
+    <input type="text" v-model="fName" />
+    <input type="text" v-model="lName" />
 
     <script src="simple-vue.js"></script>
   </body>
